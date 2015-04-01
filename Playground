@@ -1,0 +1,116 @@
+package nl.voorbeeld.coolgame;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Observable;
+import java.util.Scanner;
+
+
+import android.app.Activity;
+import android.content.Context;
+import android.widget.ImageView;
+import nl.saxion.act.playground.R;
+import nl.saxion.act.playground.model.GameBoard;
+import nl.voorbeeld.coolgame.objects.PowerBar;
+
+/**
+ * The game board for CoolGame.
+ * 
+ * @author Paul de Groot
+ */
+public class CoolGameBoard extends GameBoard {
+	private static final int GAMEBOARD_WIDTH = 15;
+	private static final int GAMEBOARD_HEIGHT = 150;
+
+	public static final String GRAS = "gras";
+	public static final String STONE = "stone";
+	public static final String WATER = "water";
+	public static final String SAND = "sand";
+	public static final String WOOD = "WOOD";
+
+
+	private String[][] lijstje = new String [GAMEBOARD_WIDTH][GAMEBOARD_HEIGHT];
+	
+	/**
+	 * Create a new game board.
+	 */
+	public CoolGameBoard(Activity activity) {
+		super(GAMEBOARD_WIDTH, GAMEBOARD_HEIGHT, activity );
+		readLineFromFile(activity, "background.txt");
+	}
+
+	@Override
+	public void onEmptyTileClicked(int x, int y) {
+		// Nothing to do in this game.
+	}
+	
+	@Override
+	public String getBackgroundImg(int mx, int my) {
+		
+		String code = lijstje[mx][my];
+		if( code == null ) return WATER;
+		
+		switch(lijstje[mx][my]) {
+	
+		case "GRA" : return GRAS;
+		case "STO" : return STONE; 
+		case "WAT" : return WATER; 
+		case "SAN" : return SAND; 
+		case "PLA" : return WOOD; 
+		default : return WOOD; 
+	
+		}
+	}
+	
+	/**
+	 * Reads a line from a file.
+	 * @param activity
+	 * @param fileName The file that needs to be read
+	 */
+	private void readLineFromFile(Activity activity, String fileName) {
+		int ypos = 0;
+		//File file = new File(fileName);
+		InputStream fIn = null;
+		
+		try {
+			fIn = activity.getResources().getAssets()
+	                .open(fileName);
+			
+			Scanner sc = new Scanner(fIn);
+			while(sc.hasNextLine()) {
+				
+				
+					verwerkRegel(sc.nextLine(), ypos);
+					ypos++;
+				
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			if( fIn != null )
+				try {
+					fIn.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+	}
+	
+	private void verwerkRegel(String regel, int ypos) {
+		int xpos = 0;
+		String woord = "";
+		Scanner sc = new Scanner(regel);
+		sc.useDelimiter(";");
+		while (sc.hasNext()) {
+			woord = sc.next();
+			lijstje[xpos][ypos] = woord;
+			xpos++;
+		}
+		
+	}
+
+}
